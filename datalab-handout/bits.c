@@ -155,10 +155,12 @@ int bitXor(int x, int y) {
  *   Rating: 1
  */
 int tmin(void) {
-
-  return 2;
-
+  // Direct Tmin definition: -2exp31
+  int tmax = (1 << 31);
+  int tmin = ~tmax + 1;
+  return tmin;
 }
+
 //2
 /*
  * isTmax - returns 1 if x is the maximum, two's complement number,
