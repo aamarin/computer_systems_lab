@@ -143,6 +143,9 @@ NOTES:
  *   Rating: 1
  */
 int bitXor(int x, int y) {
+       // Boolean equation expressed as a sum of products:
+       // (~x & y) | (x & ~y) which we can convert the OR
+       // operator into an AND using De Morgan's theorem.
        return ~( ~(~x & y) & ~(x & ~y) );
 }
 /* 
