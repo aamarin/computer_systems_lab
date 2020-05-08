@@ -156,6 +156,7 @@ int bitXor(int x, int y) {
  */
 int tmin(void) {
   // Direct Tmin definition: -2exp31
+  // by making it negative using 2's complement
   int tmax = (1 << 31);
   int tmin = ~tmax + 1;
   return tmin;
@@ -181,7 +182,19 @@ int isTmax(int x) {
  *   Rating: 2
  */
 int allOddBits(int x) {
-  return 2;
+  const int BYTE_MASK = 0xAA;
+
+  // Create a double word (x86-32bits) mask of all A's
+  int DW_MASK = BYTE_MASK;
+  DW_MASK = (DW_MASK << 8) | BYTE_MASK;
+  DW_MASK = (DW_MASK << 8) | BYTE_MASK;
+  DW_MASK = (DW_MASK << 8) | BYTE_MASK;
+
+  // Mask out odd bits (which is what we care about)
+  // XORing with double work mask will result in a
+  // 0 if all odd bits are set, non-zero other wise.
+  // ! reverses logical truth to return a 1 if all odds are set
+  return !((DW_MASK & x) ^ DW_MASK);
 }
 /* 
  * negate - return -x 
