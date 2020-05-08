@@ -12,7 +12,6 @@
  * it's not good practice to ignore compiler warnings, but in this
  * case it's OK.  
  */
-
 #if 0
 /*
  * Instructions to Students:
@@ -171,7 +170,7 @@ int tmin(void) {
  *   Rating: 1
  */
 int isTmax(int x) {
-  return 2;
+ return 2;
 }
 /* 
  * allOddBits - return 1 if all odd-numbered bits in word set to 1
@@ -217,8 +216,25 @@ int negate(int x) {
  *   Rating: 3
  */
 int isAsciiDigit(int x) {
-  return 2;
+  
+  // For a hex permitted range of 0x3X where
+  // X is 0 - 9, and forbidden ranges of A - F.
+  // Forbidden values have a most significant bit of 1
+  // and the middle two bits can be set only for 
+  // the range of A - F and not 0 - 9.
+  int is_msbit = !!(x & 0x8);
+  int is_any_middle_2_bits_set = !( !(x & 0x6) );
+
+  // Create a test for unallowed ranges
+  int is_forbidden_nibble_A_to_F = is_msbit & is_any_middle_2_bits_set;
+
+  // Values of 0x3X are valid, here we test we only have
+  // 0x30 and not a larger input (such as 0x0000F03X) where X is don't care
+  int is_first_3_nibbles_val_3 = !( (x >> 4) ^ 0x3 );
+
+  return is_first_3_nibbles_val_3 & !is_forbidden_nibble_A_to_F;
 }
+
 /* 
  * conditional - same as x ? y : z 
  *   Example: conditional(2,4,5) = 4
