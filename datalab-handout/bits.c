@@ -259,8 +259,42 @@ int conditional(int x, int y, int z) {
  *   Max ops: 24
  *   Rating: 3
  */
-int isLessOrEqual(int x, int y) {
-  return 2;
+int isLessOrEqual(int x, int y) { 
+  //
+  // <= bitwise logic
+  //
+
+  int SUBTRACT = x + ((~y) + 1);
+  int MSB = (1 << 31);
+
+  // Does subtraction lead to a signed bit?
+  const int IS_SUB_NEG = !( SUBTRACT &  MSB);
+
+  // Bit mangling
+  int x_msbit = x >> 31;
+  int y_msbit = y >> 31;
+
+  // For two positive numbers, if x < y, then
+  // x - y will lead to an negative overflow.
+  const int IS_BOTH_POS = !( x_msbit | y_msbit );
+  const int POS_LESS_THAN = IS_BOTH_POS & !IS_SUB_NEG;
+
+  // For two negative numbers,
+  const int IS_BOTH_NEG = ( x_msbit & y_msbit ); 
+  const int NEG_LESS_THAN = IS_BOTH_NEG & !IS_SUB_NEG;
+
+  // x < y if x is negative and y is positive when dealing
+  // with mixed postive and negative inputs.
+  const int MIXED_LESS_THAN = ( x_msbit & (!y_msbit) );
+
+  // Encompasses all less-than cases
+  const int IS_LESS = POS_LESS_THAN | NEG_LESS_THAN | MIXED_LESS_THAN;
+
+  // Equality testing
+  const int IS_EQUAL = !( x ^ y );
+
+  // Less than or equal to result
+  return (IS_LESS | IS_EQUAL);
 }
 //4
 /* 
