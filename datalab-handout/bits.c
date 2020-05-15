@@ -243,7 +243,14 @@ int isAsciiDigit(int x) {
  *   Rating: 3
  */
 int conditional(int x, int y, int z) {
-  return 2;
+  // Creating a mask of 0 if x is 0 and
+  // ~0 if x is non-zero.
+  const int SIGNED_MASK =  ( ( (!!x) << 31 ) >> 31 );
+
+  // Implements the following pseudocode example:
+  // (0 & y) | z = z and
+  // (~0 & y) | 0 = y.
+  return ( (SIGNED_MASK & y) | (z & (~SIGNED_MASK) ) );
 }
 /* 
  * isLessOrEqual - if x <= y  then return 1, else return 0 
