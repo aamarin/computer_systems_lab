@@ -170,7 +170,14 @@ int tmin(void) {
  *   Rating: 1
  */
 int isTmax(int x) {
- return 2;
+  // If x is 0x7FFFFFFF, then taking it's inverse gives 0x80000000
+  // Subtracting by 1 gives 0x7FFFFFFF again.  This algorithm also
+  // works on 0xFFFFFFFF as a corner case so we elimnate it conditionally.
+  int temp = (~0) ^ x;
+  int is_all_ones = !temp;
+  int neg_one = ~1 + 1;
+  temp = (temp + neg_one) ^ x;
+ return !temp & !is_all_ones;
 }
 /* 
  * allOddBits - return 1 if all odd-numbered bits in word set to 1
@@ -263,25 +270,30 @@ int isLessOrEqual(int x, int y) {
   //
   // <= bitwise logic
   //
-
-  int SUBTRACT = x + ((~y) + 1);
-  int MSB = (1 << 31);
-
-  // Does subtraction lead to a signed bit?
-  const int IS_SUB_NEG = !( SUBTRACT &  MSB);
-
-  // Bit mangling
+    // Bit mangling
   int x_msbit = x >> 31;
   int y_msbit = y >> 31;
+
+  int MSB = (1 << 31);
+  int x_no_signed_bit = x ^ MSB;
+  int y_no_signed_bit = y ^ MSB;
+
+  int SUBTRACT = x_no_signed_bit + ((~y_no_signed_bit) + 1);
+
+  // Does subtraction lead to a signed bit?
+  const int IS_SUB_NEG = !!( SUBTRACT &  MSB);
 
   // For two positive numbers, if x < y, then
   // x - y will lead to an negative overflow.
   const int IS_BOTH_POS = !( x_msbit | y_msbit );
-  const int POS_LESS_THAN = IS_BOTH_POS & !IS_SUB_NEG;
+  const int POS_LESS_THAN = IS_BOTH_POS & IS_SUB_NEG;
 
-  // For two negative numbers,
+  // For two negative numbers, if we ignore the 
+  // signed bit, the smaller number has a smaller
+  // positive integer and subtraction leads to a
+  // negative overflow.
   const int IS_BOTH_NEG = ( x_msbit & y_msbit ); 
-  const int NEG_LESS_THAN = IS_BOTH_NEG & !IS_SUB_NEG;
+  const int NEG_LESS_THAN = IS_BOTH_NEG & IS_SUB_NEG;
 
   // x < y if x is negative and y is positive when dealing
   // with mixed postive and negative inputs.
